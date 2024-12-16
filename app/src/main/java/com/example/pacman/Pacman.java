@@ -21,12 +21,15 @@ public class Pacman {
     }
 
     public Pacman(Context context, int x, int y) {
-        this.x = x + Constants.blockSize / 2;
-        this.y = y + Constants.blockSize / 2;
+        this.x = (x * Constants.blockSize) + Constants.blockSize / 2;
+        this.y = (y * Constants.blockSize) + Constants.blockSize / 2;
         pacmanDrawable = ContextCompat.getDrawable(context, R.drawable.pacman);
         updateRect();
     }
 
+    private void updateRect() {
+        pacmanRect = new Rect(x - pacmanDrawable.getIntrinsicHeight(), y - pacmanDrawable.getIntrinsicWidth(), x + pacmanDrawable.getIntrinsicHeight(), y + pacmanDrawable.getIntrinsicWidth());
+    }
 
     public void draw(Canvas canvas) {
 
@@ -50,13 +53,32 @@ public class Pacman {
         canvas.restore();
     }
 
-    private void updateRect() {
-        Log.d("Pacman", "Updating Drawable =" + pacmanDrawable.getBounds());
-        pacmanRect = new Rect(x - pacmanDrawable.getIntrinsicHeight(), y - pacmanDrawable.getIntrinsicWidth(), x + pacmanDrawable.getIntrinsicHeight(), y + pacmanDrawable.getIntrinsicWidth());
+
+    public void lookLeft() {
+        direction = Direction.LEFT;
+        rotationAngle = 180f;
+        updateRect();
     }
 
-    public  void move(){
-        Log.d("Pacman", "Current position: (" + x + ", " + y + "), moving in direction: " + direction);
+    public void lookRight() {
+        direction = Direction.RIGHT;
+        rotationAngle = 0f;
+        updateRect();
+    }
+
+    public void lookUp() {
+        direction = Direction.UP;
+        rotationAngle = 270f;
+        updateRect();
+    }
+
+    public void lookDown() {
+        direction = Direction.DOWN;
+        rotationAngle = 90f;
+        updateRect();
+    }
+
+    public void move() {
         switch (direction) {
             case UP:
                 y = y - Constants.blockSize;
@@ -75,36 +97,7 @@ public class Pacman {
                 updateRect();
                 break;
         }
-        Log.d("Pacman", "New position: (" + x + ", " + y + ")");
     }
-    public void lookLeft() {
-        direction = Direction.LEFT;
-        rotationAngle = 180f;
-        updateRect();
-        Log.d("Pacman", "Moving Left: " + x + ", " + y);
-    }
-
-    public void lookRight() {
-        direction = Direction.RIGHT;
-        rotationAngle = 0f;
-        updateRect();
-        Log.d("Pacman", "Moving Right: " + x + ", " + y);
-    }
-
-    public void lookUp() {
-        direction = Direction.UP;
-        rotationAngle = 270f;
-        updateRect();
-        Log.d("Pacman", "Moving Up: " + x + ", " + y);
-    }
-
-    public void lookDown() {
-        direction = Direction.DOWN;
-        rotationAngle = 90f;
-        updateRect();
-        Log.d("Pacman", "Moving Down: " + x + ", " + y);
-    }
-
 
     public int getX() {
         return x;
