@@ -4,10 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,8 +29,8 @@ public class GameView extends View {
     private int colorWall = ContextCompat.getColor(getContext(), R.color.purpleDark);
     private GestureDetector gestureDetector;
     private Pacman pacman;
+    private List<Ghost> ghosts;
     private GameLoop gameLoop;
-
 
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
@@ -43,11 +44,13 @@ public class GameView extends View {
         walls = wallGenerator.generateWalls(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, Constants.blockSize);
         drawGrid(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         gestureDetector = new GestureDetector(context, new GestureListener());
-        pacman = new Pacman(context, 6 * Constants.blockSize, 13 * Constants.blockSize);
-        gameLoop = new GameLoop(this,pacman);
-        Log.d("GameView", "Game loop started");
-        gameLoop.start();
+        pacman = new Pacman(context, 6, 13);
+        createGhosts(context);
+        setSettingsForGameObjects();
+        gameLoop = new GameLoop(this, pacman, ghosts);
+        gameLoop.startLoop();
     }
+
 
     @SuppressLint("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent event) {
@@ -60,14 +63,12 @@ public class GameView extends View {
             float diffX = e2.getX() - e1.getX();
             float diffY = e2.getY() - e1.getY();
             if (Math.abs(diffX) > Math.abs(diffY)) {
-
                 if (diffX > 0) {
                     pacman.lookRight();
                 } else {
                     pacman.lookLeft();
                 }
             } else {
-
                 if (diffY > 0) {
                     pacman.lookDown();
                 } else {
@@ -87,22 +88,32 @@ public class GameView extends View {
         }
     }
 
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.d("GameView", "onDraw() called");
-        if (bitmap != null) {
-            canvas.drawBitmap(bitmap, 0, 0, null);
-        } else {
-            Log.e("GameView", "Bitmap is null!");
-        }
-
+        canvas.drawBitmap(bitmap, 0, 0, null);
         for (Rect wall : walls) {
             canvas.drawRect(wall, paintWall);
         }
 
+        for (Ghost ghost : ghosts) {
+            ghost.draw(canvas);
+        }
         pacman.draw(canvas);
-        Log.d("GameView", "Pacman drawn");
+
+    }
+
+private void setSettingsForGameObjects(){
+    for (Ghost ghost : ghosts) ghost.setSettingsForGhosts(pacman, walls, ghosts);
+    pacman.setWalls(walls);
+}
+    private void createGhosts(Context context) {
+        ghosts = new ArrayList<>();
+        ghosts.add(new Ghost(context, 3, 2, Color.RED));
+        ghosts.add(new Ghost(context, 9, 2, Color.BLUE));
+        ghosts.add(new Ghost(context, 3, 25, Color.YELLOW));
+        ghosts.add(new Ghost(context, 9, 25, Color.GREEN));
+
     }
 }
+

@@ -9,24 +9,30 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
+import java.util.List;
+
 public class Pacman {
     private int x, y;
     private Drawable pacmanDrawable;
     private Rect pacmanRect;
     private float rotationAngle = 0f;
     private Direction direction = Direction.RIGHT;
+    private List<Rect> walls;
 
     private enum Direction {
         UP, DOWN, RIGHT, LEFT
     }
 
     public Pacman(Context context, int x, int y) {
-        this.x = x + Constants.blockSize / 2;
-        this.y = y + Constants.blockSize / 2;
+        this.x = (x * Constants.blockSize) + Constants.blockSize / 2;
+        this.y = (y * Constants.blockSize) + Constants.blockSize / 2;
         pacmanDrawable = ContextCompat.getDrawable(context, R.drawable.pacman);
         updateRect();
     }
 
+    private void updateRect() {
+        pacmanRect = new Rect(x - pacmanDrawable.getIntrinsicHeight(), y - pacmanDrawable.getIntrinsicWidth(), x + pacmanDrawable.getIntrinsicHeight(), y + pacmanDrawable.getIntrinsicWidth());
+    }
 
     public void draw(Canvas canvas) {
 
@@ -50,61 +56,76 @@ public class Pacman {
         canvas.restore();
     }
 
-    private void updateRect() {
-        Log.d("Pacman", "Updating Drawable =" + pacmanDrawable.getBounds());
-        pacmanRect = new Rect(x - pacmanDrawable.getIntrinsicHeight(), y - pacmanDrawable.getIntrinsicWidth(), x + pacmanDrawable.getIntrinsicHeight(), y + pacmanDrawable.getIntrinsicWidth());
-    }
 
-    public  void move(){
-        Log.d("Pacman", "Current position: (" + x + ", " + y + "), moving in direction: " + direction);
-        switch (direction) {
-            case UP:
-                y = y - Constants.blockSize;
-                updateRect();
-                break;
-            case DOWN:
-                y = y + Constants.blockSize;
-                updateRect();
-                break;
-            case LEFT:
-                x = x - Constants.blockSize;
-                updateRect();
-                break;
-            case RIGHT:
-                x = x + Constants.blockSize;
-                updateRect();
-                break;
-        }
-        Log.d("Pacman", "New position: (" + x + ", " + y + ")");
-    }
     public void lookLeft() {
         direction = Direction.LEFT;
         rotationAngle = 180f;
         updateRect();
-        Log.d("Pacman", "Moving Left: " + x + ", " + y);
     }
 
     public void lookRight() {
         direction = Direction.RIGHT;
         rotationAngle = 0f;
         updateRect();
-        Log.d("Pacman", "Moving Right: " + x + ", " + y);
     }
 
     public void lookUp() {
         direction = Direction.UP;
         rotationAngle = 270f;
         updateRect();
-        Log.d("Pacman", "Moving Up: " + x + ", " + y);
     }
 
     public void lookDown() {
         direction = Direction.DOWN;
         rotationAngle = 90f;
         updateRect();
-        Log.d("Pacman", "Moving Down: " + x + ", " + y);
     }
 
+    public void move() {
+        int futureX = x;
+        int futureY = y;
+        switch (direction) {
+            case UP:
+                futureY -= Constants.blockSize;
+                updateRect();
+                break;
+            case DOWN:
+                futureY += Constants.blockSize;
+                updateRect();
+                break;
+            case LEFT:
+                futureX -= Constants.blockSize;
+                updateRect();
+                break;
+            case RIGHT:
+                futureX += Constants.blockSize;
+                updateRect();
+                break;
+        }
+        if (canMoveTo(futureX,futureY)){
+            x = futureX;
+            y = futureY;
+            updateRect();
+        }
+    }
+    private boolean canMoveTo(int futureX, int futureY){
+        Rect newRect = new Rect(
+                futureX - pacmanDrawable.getIntrinsicHeight(),
+                futureY - pacmanDrawable.getIntrinsicWidth(),
+                futureX + pacmanDrawable.getIntrinsicHeight(),
+                futureY + pacmanDrawable.getIntrinsicWidth()
+        );
+        for (Rect wall : walls) {
+            if (Rect.intersects(newRect, wall)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void setWalls(List<Rect> walls) {
+        this.walls = walls;
+    }
 
     public int getX() {
         return x;
