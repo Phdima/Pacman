@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WallGenerator {
-    public List<Rect> generateWalls(int screenWidth, int screenHeight, int blockSize) {
+    public List<Rect> generateWalls() {
         List<Rect> walls = new ArrayList<>();
         int[][] wallCoordinates = {
                 //spawnPlace Ghost 1
@@ -57,21 +57,21 @@ public class WallGenerator {
 
         };
         for (int[] coords : wallCoordinates) {
-            int x = coords[0] * blockSize;
-            int y = coords[1] * blockSize;
-            int width = coords[2] * blockSize;
-            int height = coords[3] * blockSize;
+            int x = coords[0] * Constants.BLOCKSIZE;
+            int y = coords[1] * Constants.BLOCKSIZE;
+            int width = coords[2] * Constants.BLOCKSIZE;
+            int height = coords[3] * Constants.BLOCKSIZE;
 
             walls.add(new Rect(x, y, x + width, y + height));
         }
         //горизонтальные по краям стены
-        for (int x = 0; x < screenWidth; x += blockSize) {
-            walls.add(new Rect(x, 0, x + blockSize, blockSize));
-            walls.add(new Rect(x, screenHeight - blockSize, x + blockSize, screenHeight));
+        for (int x = 0; x < Constants.SCREEN_WIDTH; x += Constants.BLOCKSIZE) {
+            walls.add(new Rect(x, 0, x + Constants.BLOCKSIZE, Constants.BLOCKSIZE));
+            walls.add(new Rect(x, Constants.SCREEN_HEIGHT - Constants.BLOCKSIZE, x + Constants.BLOCKSIZE, Constants.SCREEN_HEIGHT));
         }
         //вертикальные по краям стены
-        walls.add(new Rect(0, 0, blockSize, screenHeight));
-        walls.add(new Rect(screenWidth - blockSize, 0, screenWidth, screenHeight));
+        walls.add(new Rect(0, 0, Constants.BLOCKSIZE, Constants.SCREEN_HEIGHT));
+        walls.add(new Rect(Constants.SCREEN_WIDTH - Constants.BLOCKSIZE, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
 
         return walls;
     }

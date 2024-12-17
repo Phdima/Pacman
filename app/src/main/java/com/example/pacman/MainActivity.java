@@ -4,11 +4,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -19,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
         this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         Constants.SCREEN_HEIGHT = displayMetrics.heightPixels;
         Constants.SCREEN_WIDTH = displayMetrics.widthPixels;
-        Constants.blockSize = displayMetrics.widthPixels / 13;
+        Constants.BLOCKSIZE = displayMetrics.widthPixels / 13;
         setContentView(R.layout.activity_main);
 
     }
