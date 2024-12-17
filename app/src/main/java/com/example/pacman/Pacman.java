@@ -9,12 +9,15 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
+import java.util.List;
+
 public class Pacman {
     private int x, y;
     private Drawable pacmanDrawable;
     private Rect pacmanRect;
     private float rotationAngle = 0f;
     private Direction direction = Direction.RIGHT;
+    private List<Rect> walls;
 
     private enum Direction {
         UP, DOWN, RIGHT, LEFT
@@ -79,24 +82,49 @@ public class Pacman {
     }
 
     public void move() {
+        int futureX = x;
+        int futureY = y;
         switch (direction) {
             case UP:
-                y = y - Constants.blockSize;
+                futureY -= Constants.blockSize;
                 updateRect();
                 break;
             case DOWN:
-                y = y + Constants.blockSize;
+                futureY += Constants.blockSize;
                 updateRect();
                 break;
             case LEFT:
-                x = x - Constants.blockSize;
+                futureX -= Constants.blockSize;
                 updateRect();
                 break;
             case RIGHT:
-                x = x + Constants.blockSize;
+                futureX += Constants.blockSize;
                 updateRect();
                 break;
         }
+        if (canMoveTo(futureX,futureY)){
+            x = futureX;
+            y = futureY;
+            updateRect();
+        }
+    }
+    private boolean canMoveTo(int futureX, int futureY){
+        Rect newRect = new Rect(
+                futureX - pacmanDrawable.getIntrinsicHeight(),
+                futureY - pacmanDrawable.getIntrinsicWidth(),
+                futureX + pacmanDrawable.getIntrinsicHeight(),
+                futureY + pacmanDrawable.getIntrinsicWidth()
+        );
+        for (Rect wall : walls) {
+            if (Rect.intersects(newRect, wall)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void setWalls(List<Rect> walls) {
+        this.walls = walls;
     }
 
     public int getX() {

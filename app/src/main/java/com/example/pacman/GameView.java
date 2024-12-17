@@ -8,11 +8,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -32,7 +30,6 @@ public class GameView extends View {
     private GestureDetector gestureDetector;
     private Pacman pacman;
     private List<Ghost> ghosts;
-
     private GameLoop gameLoop;
 
 
@@ -49,7 +46,7 @@ public class GameView extends View {
         gestureDetector = new GestureDetector(context, new GestureListener());
         pacman = new Pacman(context, 6, 13);
         createGhosts(context);
-        for (Ghost ghost : ghosts) ghost.setFollowToPacman(pacman);
+        setSettingsForGameObjects();
         gameLoop = new GameLoop(this, pacman, ghosts);
         gameLoop.startLoop();
     }
@@ -106,14 +103,17 @@ public class GameView extends View {
 
     }
 
-    public List<Ghost> createGhosts(Context context) {
+private void setSettingsForGameObjects(){
+    for (Ghost ghost : ghosts) ghost.setSettingsForGhosts(pacman, walls, ghosts);
+    pacman.setWalls(walls);
+}
+    private void createGhosts(Context context) {
         ghosts = new ArrayList<>();
         ghosts.add(new Ghost(context, 3, 2, Color.RED));
         ghosts.add(new Ghost(context, 9, 2, Color.BLUE));
         ghosts.add(new Ghost(context, 3, 25, Color.YELLOW));
         ghosts.add(new Ghost(context, 9, 25, Color.GREEN));
 
-        return ghosts;
     }
 }
 

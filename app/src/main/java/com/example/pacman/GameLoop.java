@@ -16,7 +16,7 @@ public class GameLoop {
     private List<Ghost> ghosts;
     private GameView gameView;
 
-    public GameLoop(GameView gameView, Pacman pacman,List<Ghost> ghosts) {
+    public GameLoop(GameView gameView, Pacman pacman, List<Ghost> ghosts) {
         this.gameView = gameView;
         this.pacman = pacman;
         this.ghosts = ghosts;
@@ -37,11 +37,10 @@ public class GameLoop {
     }
 
     private void updateGameObjects() {
-        pacman.move();
-        for (Ghost ghost: ghosts) {
+        for (Ghost ghost : ghosts) {
             ghost.updateGhostPosition();
         }
-
+        pacman.move();
     }
 
 
