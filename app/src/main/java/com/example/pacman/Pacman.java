@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
@@ -24,14 +23,17 @@ public class Pacman {
     }
 
     public Pacman(Context context, int x, int y) {
-        this.x = (x * Constants.blockSize) + Constants.blockSize / 2;
-        this.y = (y * Constants.blockSize) + Constants.blockSize / 2;
+        this.x = (x * Constants.BLOCKSIZE) + Constants.BLOCKSIZE / 2;
+        this.y = (y * Constants.BLOCKSIZE) + Constants.BLOCKSIZE / 2;
         pacmanDrawable = ContextCompat.getDrawable(context, R.drawable.pacman);
         updateRect();
     }
 
     private void updateRect() {
         pacmanRect = new Rect(x - pacmanDrawable.getIntrinsicHeight(), y - pacmanDrawable.getIntrinsicWidth(), x + pacmanDrawable.getIntrinsicHeight(), y + pacmanDrawable.getIntrinsicWidth());
+    }
+    public Rect getRect() {
+        return pacmanRect;
     }
 
     public void draw(Canvas canvas) {
@@ -86,29 +88,30 @@ public class Pacman {
         int futureY = y;
         switch (direction) {
             case UP:
-                futureY -= Constants.blockSize;
+                futureY -= Constants.BLOCKSIZE;
                 updateRect();
                 break;
             case DOWN:
-                futureY += Constants.blockSize;
+                futureY += Constants.BLOCKSIZE;
                 updateRect();
                 break;
             case LEFT:
-                futureX -= Constants.blockSize;
+                futureX -= Constants.BLOCKSIZE;
                 updateRect();
                 break;
             case RIGHT:
-                futureX += Constants.blockSize;
+                futureX += Constants.BLOCKSIZE;
                 updateRect();
                 break;
         }
-        if (canMoveTo(futureX,futureY)){
+        if (canMoveTo(futureX, futureY)) {
             x = futureX;
             y = futureY;
             updateRect();
         }
     }
-    private boolean canMoveTo(int futureX, int futureY){
+
+    private boolean canMoveTo(int futureX, int futureY) {
         Rect newRect = new Rect(
                 futureX - pacmanDrawable.getIntrinsicHeight(),
                 futureY - pacmanDrawable.getIntrinsicWidth(),

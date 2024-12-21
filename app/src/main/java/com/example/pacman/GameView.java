@@ -23,13 +23,15 @@ import java.util.List;
 public class GameView extends View {
     private Bitmap bitmap;
     private Canvas bitmapCanvas;
-    private Paint paint, paintWall;
+    private Paint paint, paintWall, paintFood;
     private List<Rect> walls;
     private int FieldColor = ContextCompat.getColor(getContext(), R.color.purpleLight);
     private int colorWall = ContextCompat.getColor(getContext(), R.color.purpleDark);
     private GestureDetector gestureDetector;
     private Pacman pacman;
     private List<Ghost> ghosts;
+    private FoodCircles foodCircles;
+    private Cherry cherry;
     private GameLoop gameLoop;
 
 
@@ -39,15 +41,20 @@ public class GameView extends View {
         bitmapCanvas = new Canvas(bitmap);
         paint = new Paint();
         paintWall = new Paint();
+        paintFood = new Paint();
         paintWall.setColor(colorWall);
         WallGenerator wallGenerator = new WallGenerator();
-        walls = wallGenerator.generateWalls(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT, Constants.blockSize);
+        walls = wallGenerator.generateWalls();
         drawGrid(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         gestureDetector = new GestureDetector(context, new GestureListener());
         pacman = new Pacman(context, 6, 13);
         createGhosts(context);
+        foodCircles = new FoodCircles();
+        cherry = new Cherry(context);
         setSettingsForGameObjects();
-        gameLoop = new GameLoop(this, pacman, ghosts);
+        foodCircles.generateFood();
+        cherry.generatePositionFromFood();
+        gameLoop = new GameLoop(this, pacman, ghosts, foodCircles, cherry);
         gameLoop.startLoop();
     }
 
@@ -80,10 +87,10 @@ public class GameView extends View {
     }
 
     private void drawGrid(int screenWidth, int screenHeight) {
-        for (int x = 0; x < screenWidth; x += Constants.blockSize) {
-            for (int y = 0; y < screenHeight; y += Constants.blockSize) {
+        for (int x = 0; x < screenWidth; x += Constants.BLOCKSIZE) {
+            for (int y = 0; y < screenHeight; y += Constants.BLOCKSIZE) {
                 paint.setColor(FieldColor);
-                bitmapCanvas.drawRect(x, y, x + Constants.blockSize, y + Constants.blockSize, paint);
+                bitmapCanvas.drawRect(x, y, x + Constants.BLOCKSIZE, y + Constants.BLOCKSIZE, paint);
             }
         }
     }
@@ -95,7 +102,8 @@ public class GameView extends View {
         for (Rect wall : walls) {
             canvas.drawRect(wall, paintWall);
         }
-
+        foodCircles.drawFood(canvas, paintFood);
+        cherry.draw(canvas);
         for (Ghost ghost : ghosts) {
             ghost.draw(canvas);
         }
@@ -103,15 +111,18 @@ public class GameView extends View {
 
     }
 
-private void setSettingsForGameObjects(){
-    for (Ghost ghost : ghosts) ghost.setSettingsForGhosts(pacman, walls, ghosts);
-    pacman.setWalls(walls);
-}
+    private void setSettingsForGameObjects() {
+        for (Ghost ghost : ghosts) ghost.setSettingsForGhosts(pacman, walls, ghosts);
+        pacman.setWalls(walls);
+        foodCircles.setGameObjects(pacman, ghosts, walls);
+        cherry.setGameObjects(pacman,ghosts,foodCircles);
+    }
+
     private void createGhosts(Context context) {
         ghosts = new ArrayList<>();
         ghosts.add(new Ghost(context, 3, 2, Color.RED));
         ghosts.add(new Ghost(context, 9, 2, Color.BLUE));
-        ghosts.add(new Ghost(context, 3, 25, Color.YELLOW));
+        ghosts.add(new Ghost(context, 3, 25, ContextCompat.getColor(getContext(), R.color.orange)));
         ghosts.add(new Ghost(context, 9, 25, Color.GREEN));
 
     }
